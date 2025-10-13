@@ -21,7 +21,7 @@
 
 -->
 <notificationConfig> 
-  <version>3</version>  
+  <version>5.0.0.0</version>  
   <lang name="en"> 
     <!-- language specific notifications -->  
     <deploymentFailureNotification> 
@@ -30,7 +30,7 @@
       <!--<email>admin2@example.com</email>--> 
     </deploymentFailureNotification>  
     <approverEmails> 
-      <!-- list of content approver emails -->  
+      <!-- list of content reviewer emails -->  
       <!--<email>admin@example.com</email>-->  
       <!--<email>admin2@example.com</email>--> 
     </approverEmails>  
@@ -91,7 +91,7 @@
 ]]></body> 
       </emailTemplate>  
       <emailTemplate key="contentApproved"> 
-        <subject><![CDATA[<#if scheduleDate??>Content Scheduled <#else>Content Approved</#if>]]></subject>  
+        <subject><![CDATA[<#if publishPackage.schedule??>Content Scheduled <#else>Content Approved</#if>]]></subject>  
         <!-- Timezone can/is being overwritten in the following template -->  
         <body><![CDATA[
                         <#setting time_zone='EST'>
@@ -101,10 +101,10 @@
                             </head>
                             <body style=" font-size: 12pt;">
                                 <p>
-                                    <#if scheduleDate??>
-                                        The following content has been scheduled for publishing on ${scheduleDate?string["MMM dd, yyyy 'at' hh:mm a"]} Eastern Time.
+                                    <#if publishPackage.schedule??>
+                                        The following content has been scheduled for publishing on ${publishPackage.schedule?datetime.iso?string["MMM dd, yyyy 'at' hh:mm a"]} Eastern Time.
                                     <#else>
-                                        The following content has been reviewed and approved by ${approver.firstName!approver.username} ${approver.lastName!""}:
+                                        The following content has been reviewed and approved by ${reviewer.firstName!reviewer.username} ${reviewer.lastName!""}:
                                     </#if>
                                     <ul>
                                        <#list files as file>
@@ -119,7 +119,7 @@
                                            </li>
                                        </#list>
                                     </ul><br/>
-                                    <#if scheduleDate??>
+                                    <#if publishPackage.schedule??>
                                         <a href="${liveUrl}">Click Here to View Your Published Content</a>
                                         <br/>
                                     </#if>
@@ -137,7 +137,7 @@
                         </head>
                         <body style=" font-size: 12pt">
                             <p>
-                                ${submitter.first_name!submitter.username} ${submitter.last_name} has submitted items for your review:
+                                ${submitter.firstName!submitter.username} ${submitter.lastName} has submitted items for your review:
                                 <ul>
                                     <#list files as file>
                                         <li>
@@ -151,9 +151,9 @@
                                         </li>
                                     </#list>
                                 </ul>
-                                <#if submissionComments?has_content>
+                                <#if publishPackage.submitterComment?has_content>
                                     Comments:<br/>
-                                    ${submissionComments!""}
+                                    ${publishPackage.submitterComment!""}
                                     <br/>
                                 </#if>
                                 <br/>
@@ -188,7 +188,7 @@
                                         </#list>
                                     </ul>
                                     Reason:<br/>
-                                    ${rejectionReason!""}
+                                    ${publishPackage.reviewerComment!""}
                                     <br/><br/>
                                 </p>
                             </body>
